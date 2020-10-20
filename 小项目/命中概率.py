@@ -5,74 +5,133 @@
 from tkinter import *
 import tkinter.messagebox
 from sympy import *
+from math import *
+import scipy.integrate as si
 
 
 class LoginPage(object):
     def __init__(self, master=None):
-        self.root = master  # 定义内部变量root
-        self.root.geometry('%dx%d' % (400, 300))  # 设置窗口大小
-        self.N = StringVar()
-        self.M = StringVar()
-        self.T = StringVar()
-        self.Q = StringVar()
-        self.createPage()
 
-    def createPage(self):
-        self.page = Frame(self.root)  # 创建Frame
-        self.page.pack()
-        Label(self.page).grid(row=0, stick=W)
-        Label(self.page, text='行: ').grid(row=1, stick=W, pady=10)
-        Entry(self.page, textvariable=self.N, borderwidth=3, highlightcolor='red', highlightthickness=1, width=10)\
-            .grid(row=1, column=1, stick=E)
-        Label(self.page, text='列: ').grid(row=2, stick=W, pady=10)
-        Entry(self.page, textvariable=self.M, borderwidth=3, highlightcolor='red', highlightthickness=1, width=10).\
-            grid(row=2, column=1, stick=E)
-        Button(self.page, text='确认', command=self.loginCheck).grid(row=5, column=1, stick=W, pady=10)
-
-    def Isspace(self, text):
-        temp = 0
-        for i in text:
-            if not i.isspace():
-                temp = 1
-                break
-
-        if temp == 1:
-            return 0
-        else:
-            return 1
-
-    def loginCheck(self):
-        global N
-        global M
-        name1 = self.N.get().rstrip().split()
-        password1 = self.M.get().rstrip().split()
-
-        print(name1, password1)
-        if len(name1) == 0 or len(password1) == 0:
-            tkinter.messagebox.showinfo(title='结果', message='请正确输入!')
-
-        N = int(name1[0])
-        M = int(password1[0])
-
-        self.page.destroy()
-        MainPage(self.root)
-
-
-class MainPage(object):
-    def __init__(self, master=None):
         self.root = master  # 定义内部变量root
         self.root.geometry('%dx%d' % (800, 600))  # 设置窗口大小
         self.createPage()
 
     def createPage(self):
-        self.inputPage = InputFrame(self.root)  # 创建不同Frame
-        self.inputPage.pack()  # 默认显示数据录入界面
-        # menubar = Menu(self.root)
-        # menubar.add_command(label='纯策略', command=self.inputData)
-        # self.root['menu'] = menubar  # 设置菜单栏
+        # 创建Frame
+        self.page = Frame(self.root)
+        self.shot_1 = Shot1Frame(self.root)
+        self.shot_2 = Shot2Frame(self.root)
+        self.shot_1.pack()
+        # 设置菜单栏名称
+        menubar = Menu(self.root)
+        menubar.add_command(label='命中概率计算方法1', command=self.shot_1_page)
+        menubar.add_command(label='命中概率计算方法2', command=self.shot_2_page)
 
-    def inputData(self):
-        self.inputPage.pack()
+        # 设置菜单栏
+        self.root['menu'] = menubar
+
+    # 命中概率计算方法1 界面
+    def shot_1_page(self):
+        self.shot_1.pack()
+        self.shot_2.pack_forget()
+
+    # 命中概率计算方法2 界面
+    def shot_2_page(self):
+        self.shot_2.pack()
+        self.shot_1.pack_forget()
+
+
+# 命中概率计算方法1 类
+class Shot1Frame(Frame):
+    def __init__(self, master=None):
+        Frame.__init__(self, master)
+        self.root = master  # 定义内部变量root
+        self.E1 = Entry(self, borderwidth=3, highlightcolor='red', highlightthickness=1, width=10)
+        self.E2 = Entry(self, borderwidth=3, highlightcolor='red', highlightthickness=1, width=10)
+        self.E3 = Entry(self, borderwidth=3, highlightcolor='red', highlightthickness=1, width=10)
+        self.E4 = Entry(self, borderwidth=3, highlightcolor='red', highlightthickness=1, width=10)
+        self.E5 = Entry(self, borderwidth=3, highlightcolor='red', highlightthickness=1, width=10)
+        self.E6 = Entry(self, borderwidth=3, highlightcolor='red', highlightthickness=1, width=10)
+        self.E7 = Entry(self, borderwidth=3, highlightcolor='red', highlightthickness=1, width=10)
+        self.E8 = Entry(self, borderwidth=3, highlightcolor='red', highlightthickness=1, width=10)
+        self.E9 = Entry(self, borderwidth=3, highlightcolor='red', highlightthickness=1, width=10)
+        self.E10 = Entry(self, borderwidth=3, highlightcolor='red', highlightthickness=1, width=10)
+        self.E11 = Entry(self, borderwidth=3, highlightcolor='red', highlightthickness=1, width=10)
+        self.page = Frame(self.root)  # 创建Frame
+        self.page.pack()
+        self.createPage()
+
+    # 子界面
+    def createPage(self):
+        Label(self).grid(row=1, stick=W, pady=10)
+
+        Label(self, text='Ex: ').grid(row=11, column=1, stick=W, pady=10)
+        self.E1.grid(row=11, column=3, stick=E)
+
+        Label(self, text='Ey: ').grid(row=15, column=1, stick=W, pady=10)
+        self.E2.grid(row=15, column=3, stick=E)
+
+        Label(self, text='alpha: ').grid(row=3, column=13, stick=W, pady=10)
+        self.E5.grid(row=5, column=13, stick=E)
+
+        Label(self, text='beta: ').grid(row=3, column=17, stick=W, pady=10)
+        self.E6.grid(row=5, column=17, stick=E)
+
+        Label(self, text='sigma: ').grid(row=7, column=13, stick=W, pady=10)
+        self.E7.grid(row=9, column=13, stick=E)
+
+        Label(self, text='gamma: ').grid(row=7, column=17, stick=W, pady=10)
+        self.E8.grid(row=9, column=17, stick=E)
+
+        Label(self, text='miu_x: ').grid(row=11, column=13, stick=W, pady=10)
+        self.E9.grid(row=13, column=13, stick=E)
+
+        Label(self, text='miu_y: ').grid(row=11, column=17, stick=W, pady=10)
+        self.E10.grid(row=13, column=17, stick=E)
+
+        Label(self, text='命中概率: ').grid(row=21, column=9, stick=W, pady=10)
+
+        Button(self, text='计算', command=self.click).grid(row=25, column=7, stick=E, pady=10)
+
+        Button(self, text='退出', command=self.page.quit).grid(row=25, column=15, stick=E, pady=10)
+
+    # 点击计算后的计算程序
+    def click(self):
+        Ex = float(self.E1.get())
+        Ey = float(self.E2.get())
+        alpha = float(self.E5.get())
+        beta = float(self.E6.get())
+        sigma = float(self.E7.get())
+        gamma = float(self.E8.get())
+        miu_x = float(self.E9.get())
+        miu_y = float(self.E10.get())
+
+        # 概率密度函数
+        def f(x):
+            return 2 / sqrt(pi) * e ** (-x ** 2)
+
+        # 设置概率密度函数积分
+        def calculate(t):
+            x = symbols('x')
+            f = 2/sqrt(pi)*e**(-x**2)
+            # p = integrate(f, (x, 0, t))
+            result = si.quad(f, 0, t)
+            return result[0]
+
+        P = 1/4 * (calculate((beta-miu_x)/Ex) - calculate((alpha-miu_x)/Ex)) * (calculate((sigma-miu_y)/Ey)-calculate((gamma-miu_y)/Ey))
+
+        print(str(P))
+
+        Label(self, text=str(P)).grid(row=21, column=11, stick=W, pady=10)
+
+    # 计算结果并返回为字符串
+
+
+# 命中概率计算方法2 类
+class Shot2Frame(object):
+    def __init__(self, master=None):
+        pass
+
 
 
 class InputFrame(Frame):  # 继承Frame类
